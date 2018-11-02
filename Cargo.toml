@@ -5,7 +5,7 @@ authors = ["Yusuke Sangenya <longinus.eva@gmail.com>"]
 edition = "2018"
 
 [lib]
-name = "text2image"
+name = "reing_text2image"
 path = "src/lib.rs"
 
 [[bin]]
