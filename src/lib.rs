@@ -2,70 +2,79 @@ extern crate image;
 extern crate imageproc;
 extern crate rusttype;
 
+use std::path::Path;
 use imageproc::rect::Rect;
 use imageproc::drawing::{draw_text_mut, draw_filled_rect_mut};
 use image::{Rgb, RgbImage};
 use rusttype::{Font, FontCollection, Scale};
 
-pub struct ImageData {
+pub struct TextImage {
     pub text: String,
     pub brand: String,
     pub rgb_color: (u8,u8,u8)
 }
 
-pub fn text2image(data: ImageData) -> image::RgbImage {
-    let ImageData { text, brand, rgb_color } = data;
-    let (r, g, b) = rgb_color;
-    let color = Rgb([r, g, b]);
-
-    let font = get_vl_gothic();
-
-    let full_font_size = 22.5;
-    let half_font_size = full_font_size / 2.;
-    let scale = Scale { x: full_font_size, y: full_font_size };
-
-    let max_text_length = 44;
-    let wrapped_text = wrap_text(text, max_text_length);
-
-    let text_height = (wrapped_text.len() as f32) * full_font_size;
-    let minimum_image_height = 344;
-    let image_width = 600;
-    let image_height = (50. + text_height + 90.) as u32;
-    let (image_height, text_start_at_x, text_start_at_y) = if image_height >= minimum_image_height {
-        (image_height, 50., 50.)
-    } else {
-        (minimum_image_height, 50., 50. + ((minimum_image_height - 140 - text_height as u32)/2) as f32)
-    };
-    let mut image = RgbImage::from_pixel(image_width, image_height, color);
-    let rect = Rect::at(20, 20).of_size(image_width - 40, image_height - 80);
-    draw_filled_rect_mut(&mut image, rect, Rgb([255, 255, 255]));
-
-    for (v_index, line) in wrapped_text.into_iter().enumerate() {
-        let mut h_index = 0u32;
-        for c in line.chars() {
-            let x_position = (text_start_at_x + (h_index as f32) * half_font_size) as u32;
-            let y_position = (text_start_at_y + (v_index as f32) * full_font_size) as u32;
-            draw_text_mut(
-                &mut image, Rgb([0, 0, 0]),
-                x_position, y_position,
-                scale, &font, &c.to_string()
-            );
-
-            h_index += char_len(c);
-        }
+impl TextImage {
+    pub fn new(text: String, brand: String, rgb_color: (u8,u8,u8)) -> Self {
+        Self { text, brand, rgb_color }
     }
 
-    let logo_scale = Scale { x: 25., y: 25. };
-    let logo_x_position = 30;
-    let logo_y_position = image_height - 45;
-    let tanuki_font = get_tanuki_magic();
-    draw_text_mut(
-        &mut image, Rgb([255, 255, 255]),
-        logo_x_position, logo_y_position,
-        logo_scale, &tanuki_font, &brand
-    );
+    pub fn save_image(&self, path: &Path) -> Result<(), std::io::Error> {
+        self.text2image().save(path).map(|_| ())
+    }
 
-    return image;
+    pub fn text2image(&self) -> image::RgbImage {
+        let color = Rgb([self.rgb_color.0, self.rgb_color.1, self.rgb_color.2]);
+
+        let font = get_vl_gothic();
+
+        let full_font_size = 22.5;
+        let half_font_size = full_font_size / 2.;
+        let scale = Scale { x: full_font_size, y: full_font_size };
+
+        let max_text_length = 44;
+        let wrapped_text = wrap_text(self.text.clone(), max_text_length);
+
+        let text_height = (wrapped_text.len() as f32) * full_font_size;
+        let minimum_image_height = 344;
+        let image_width = 600;
+        let image_height = (50. + text_height + 90.) as u32;
+        let (image_height, text_start_at_x, text_start_at_y) = if image_height >= minimum_image_height {
+            (image_height, 50., 50.)
+        } else {
+            (minimum_image_height, 50., 50. + ((minimum_image_height - 140 - text_height as u32)/2) as f32)
+        };
+        let mut image = RgbImage::from_pixel(image_width, image_height, color);
+        let rect = Rect::at(20, 20).of_size(image_width - 40, image_height - 80);
+        draw_filled_rect_mut(&mut image, rect, Rgb([255, 255, 255]));
+
+        for (v_index, line) in wrapped_text.into_iter().enumerate() {
+            let mut h_index = 0u32;
+            for c in line.chars() {
+                let x_position = (text_start_at_x + (h_index as f32) * half_font_size) as u32;
+                let y_position = (text_start_at_y + (v_index as f32) * full_font_size) as u32;
+                draw_text_mut(
+                    &mut image, Rgb([0, 0, 0]),
+                    x_position, y_position,
+                    scale, &font, &c.to_string()
+                );
+
+                h_index += char_len(c);
+            }
+        }
+
+        let logo_scale = Scale { x: 25., y: 25. };
+        let logo_x_position = 30;
+        let logo_y_position = image_height - 45;
+        let tanuki_font = get_tanuki_magic();
+        draw_text_mut(
+            &mut image, Rgb([255, 255, 255]),
+            logo_x_position, logo_y_position,
+            logo_scale, &tanuki_font, &self.brand
+        );
+
+        return image;
+    }
 }
 
 #[test]
