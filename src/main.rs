@@ -21,7 +21,7 @@ fn main() {
         )
         .arg(Arg::with_name("rgb")              // オプションを定義
             .value_name("RGB")
-            .help("Background color. Default: 255,255,255")              // ヘルプメッセージ
+            .help("Background color. Default: 00,A2,9A")              // ヘルプメッセージ
             .takes_value(true)
             .long("rgb")
             .required(false)                  // 値を持つことを定義
@@ -38,10 +38,10 @@ fn main() {
     let brand = matches.value_of("brand").unwrap_or("Reing");
     let path = matches.value_of("output").unwrap_or("./output.jpg");
     let color = if let Some(rgb_str) = matches.value_of("rgb") {
-        let rgb = rgb_str.split(',').map(|s| s.parse().expect("Error: each color value should be between 0 and 255.")).collect::<Vec<u8>>();
+        let rgb = rgb_str.split(',').map(|s| u8::from_str_radix(s, 16).expect("Error: each color value should be between 00 and FF.")).collect::<Vec<u8>>();
         (rgb[0], rgb[1], rgb[2])
     } else {
-        (0,0,0)
+        (0x00,0xA2,0x9A)
     };
     let text_image = TextImage::new(String::from(text), String::from(brand), color);
     text_image.save_image(&Path::new(path)).unwrap();
