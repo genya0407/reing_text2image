@@ -2,3 +2,5 @@
 **/*.rs.bk
 *.png
 *.jpg
+!/example/*.jpg
+!/example/*.png
