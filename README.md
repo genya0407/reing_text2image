@@ -66,3 +66,5 @@ You can change output image file type. Just change the output filename.
 ```console
 $ cargo run -- '5000兆円欲しい！！' --output example/5000tyouen.png
 ```
+
+Currently, only `jpg` and `png` are supported.
