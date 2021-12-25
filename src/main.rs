@@ -10,7 +10,7 @@ fn main() {
         .arg(Arg::with_name("text")               // 位置引数を定義
             .value_name("TEXT")
             .help("Text to write.")     // ヘルプメッセージ
-            .required(true)                         // この引数は必須であることを定義
+            .required(false)
         )
         .arg(Arg::with_name("brand")
             .value_name("BRAND")
@@ -34,7 +34,11 @@ fn main() {
         );
     
     let matches = app.get_matches();
-    let text = matches.value_of("text").expect("Error: text must be specified.");
+    let text = if let Some(s) = matches.value_of("text").map(|s| String::from(s)) {
+        s
+    } else {
+        text_from_stdin()
+    };
     let brand = matches.value_of("brand").unwrap_or("Reing");
     let path = matches.value_of("output").unwrap_or("./output.jpg");
     let color = if let Some(rgb_str) = matches.value_of("rgb") {
@@ -44,5 +48,12 @@ fn main() {
         (0x00,0xA2,0x9A)
     };
     let text_image = TextImage::new(String::from(text), String::from(brand), color);
-    text_image.save_image(&Path::new(path)).unwrap();
+    text_image.save_image(&Path::new(path));
+}
+
+fn text_from_stdin() -> String {
+    use std::io::Read;
+    let mut s = String::new();
+    std::io::stdin().read_to_string(&mut s).unwrap();
+    s
 }

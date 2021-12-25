@@ -6,7 +6,7 @@ use std::path::Path;
 use imageproc::rect::Rect;
 use imageproc::drawing::{draw_text_mut, draw_filled_rect_mut};
 use image::{Rgb, RgbImage};
-use rusttype::{Font, FontCollection, Scale};
+use rusttype::{Font, Scale};
 
 pub struct TextImage {
     pub text: String,
@@ -19,8 +19,8 @@ impl TextImage {
         Self { text, brand, rgb_color }
     }
 
-    pub fn save_image(&self, path: &Path) -> Result<(), std::io::Error> {
-        self.text2image().save(path).map(|_| ())
+    pub fn save_image(&self, path: &Path) {
+        self.text2image().save(path).unwrap();
     }
 
     pub fn text2image(&self) -> image::RgbImage {
@@ -147,14 +147,14 @@ fn wrap_text(text: String, max_length: u32 /* in ascii character */) -> Vec<Stri
     return wrapped_lines;
 }
 
-fn get_vl_gothic<'a>() -> Font<'a> {
-    let font = Vec::from(include_bytes!("../font/VL-Gothic-Regular.ttf") as &[u8]);
-    FontCollection::from_bytes(font).unwrap().into_font().unwrap()
+fn get_vl_gothic() -> Font<'static> {
+    let font_data: &[u8] = include_bytes!("../font/VL-Gothic-Regular.ttf");
+    Font::try_from_bytes(font_data).unwrap()
 }
 
-fn get_tanuki_magic<'a>() -> Font<'a> {
-    let font = Vec::from(include_bytes!("../font/TanukiMagic.ttf") as &[u8]);
-    FontCollection::from_bytes(font).unwrap().into_font().unwrap()    
+fn get_tanuki_magic() -> Font<'static> {
+    let font_data: &[u8] = include_bytes!("../font/TanukiMagic.ttf");
+    Font::try_from_bytes(font_data).unwrap()    
 }
 
 fn char_len(c: char) -> u32 { // in ascii character
