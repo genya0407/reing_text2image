@@ -55,11 +55,11 @@ jobs:
           use-cross: true
 
       - run: |
-          zip --junk-paths scan-${{ matrix.target }} target/${{ matrix.target }}/release/scan{,.exe}
+          zip --junk-paths text2image-${{ matrix.target }} target/${{ matrix.target }}/release/text2image{,.exe}
       - uses: actions/upload-artifact@v1
         with:
           name: build-${{ matrix.target }}
-          path: scan-${{ matrix.target }}.zip
+          path: text2image-${{ matrix.target }}.zip
 
   create-release:
     needs: [build]
@@ -105,6 +105,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.upload-url.outputs.url }}
-          asset_path: ./build-${{ matrix.target }}/scan-${{ matrix.target }}.zip
-          asset_name: scan-${{ matrix.target }}.zip
+          asset_path: ./build-${{ matrix.target }}/text2image-${{ matrix.target }}.zip
+          asset_name: text2image-${{ matrix.target }}.zip
           asset_content_type: application/zip
