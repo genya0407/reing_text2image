@@ -14,6 +14,7 @@ jobs:
           - x86_64-unknown-linux-gnu
           - x86_64-pc-windows-gnu
           - x86_64-apple-darwin
+          - aarch64-unknown-linux-gnu
         include:
           - target: x86_64-unknown-linux-gnu
             os: ubuntu-latest
@@ -21,6 +22,8 @@ jobs:
             os: ubuntu-latest
           - target: x86_64-apple-darwin
             os: macos-latest
+          - target: aarch64-unknown-linux-gnu
+            os: ubuntu-latest
 
     runs-on: ${{ matrix.os }}
 
@@ -88,6 +91,7 @@ jobs:
           - x86_64-unknown-linux-gnu
           - x86_64-pc-windows-gnu
           - x86_64-apple-darwin
+          - aarch64-unknown-linux-gnu
     needs: [create-release]
     runs-on: ubuntu-latest
     steps:
